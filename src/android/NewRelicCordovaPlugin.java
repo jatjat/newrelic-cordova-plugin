@@ -25,6 +25,9 @@ import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import org.json.JSONObject;
+import java.util.*;
+
 public class NewRelicCordovaPlugin extends CordovaPlugin {
     private final static String TAG = NewRelicCordovaPlugin.class.getSimpleName();
 
@@ -52,4 +55,41 @@ public class NewRelicCordovaPlugin extends CordovaPlugin {
 
     }
 
+    @Override
+    public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
+        if (action.equals("RecordCustomEvent")) {
+            String eventType = data.getString(0);
+            String eventName = data.getString(1);
+            JSONObject eventAttributes = data.getJSONObject(2);
+            Map<String, Object> eventAttributesMap = toMap(eventAttributes);
+
+            NewRelic.recordCustomEvent(eventType, eventName, eventAttributesMap);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // See:
+    // https://stackoverflow.com/questions/21720759/convert-a-json-string-to-a-hashmap
+    
+    public static Map<String, Object> toMap(JSONObject object) throws JSONException {
+        Map<String, Object> map = new HashMap<String, Object>();
+    
+        Iterator<String> keysItr = object.keys();
+        while(keysItr.hasNext()) {
+            String key = keysItr.next();
+            Object value = object.get(key);
+    
+            if(value instanceof JSONArray) {
+                throw new JSONException("Cannot send a list to New Relic as a custom event attribute");
+            }
+    
+            else if(value instanceof JSONObject) {
+                throw new JSONException("Cannot send a map to New Relic as a value in a custom event attribute");
+            }
+            map.put(key, value);
+        }
+        return map;
+    }
 }
