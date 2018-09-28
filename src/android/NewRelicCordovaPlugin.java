@@ -57,23 +57,27 @@ public class NewRelicCordovaPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("RecordCustomEvent")) {
+        if (action.equals("recordCustomEvent")) {
             String eventType = data.getString(0);
             String eventName = data.getString(1);
             JSONObject eventAttributes = data.getJSONObject(2);
             Map<String, Object> eventAttributesMap = toMap(eventAttributes);
 
-            NewRelic.recordCustomEvent(eventType, eventName, eventAttributesMap);
+            Boolean success = NewRelic.recordCustomEvent(eventType, eventName, eventAttributesMap);
+
+            if (success == true) {
+                callbackContext.success("Custom event was succesfully sent to New Relic");
+            } else {
+                callbackContext.error("Custom event failed to be sent to New Relic");
+            }
+
             return true;
         } else {
             return false;
         }
     }
 
-    // See:
-    // https://stackoverflow.com/questions/21720759/convert-a-json-string-to-a-hashmap
-    
-    public static Map<String, Object> toMap(JSONObject object) throws JSONException {
+    private static Map<String, Object> toMap(JSONObject object) throws JSONException {
         Map<String, Object> map = new HashMap<String, Object>();
     
         Iterator<String> keysItr = object.keys();

@@ -18,7 +18,7 @@ module.exports = {
         if (invalid) {
             errorCallback('Each event attribute cannot be a list or object');
         } else {
-            cordova.exec(successCallback, errorCallback, 'NewRelicCordovaPlugin', 'RecordCustomEvent', [eventType, eventName, eventAttributes]);
+            cordova.exec(successCallback, errorCallback, 'NewRelicCordovaPlugin', 'recordCustomEvent', [eventType, eventName, eventAttributes]);
         }
     }
 };

@@ -31,4 +31,23 @@
 	}
 }
 
+- (void)recordCustomEvent:(CDVInvokedUrlCommand*)command
+{
+	CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+	                           messageAsString:@"Custom event failed to be sent to New Relic"];
+
+    NSString* eventType = [[command arguments] objectAtIndex:0];
+    NSString* eventName = [[command arguments] objectAtIndex:1];
+    NSDictionary* attributes = [[command arguments] objectAtIndex:2];
+
+	BOOL eventRecorded = [NewRelic recordCustomEvent:eventType name:eventName attributes: attributes];
+
+	if (eventRecorded == true) {
+    	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+		          messageAsString: @"Custom event was succesfully sent to New Relic"];
+	}
+
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
 @end

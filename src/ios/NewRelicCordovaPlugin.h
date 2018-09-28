@@ -12,7 +12,6 @@
 #import <NewRelicAgent/NewRelic.h>
 #import <Cordova/CDV.h>
 
-@interface NewRelicCordovaPlugin : CDVPlugin {
-    
-}
+@interface NewRelicCordovaPlugin : CDVPlugin
+    - (void) recordCustomEvent:(CDVInvokedUrlCommand*)command;
 @end
